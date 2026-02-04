@@ -31,7 +31,7 @@ export function useScan() {
   }, []);
 
   const startScan = useCallback(
-    async (servers: Array<{ host: string; user: string; key_base64: string }>) => {
+    async (servers: Array<{ host: string; user: string; key_base64: string; host_name?: string }>) => {
       setReportFilename(null);
       setReportError(null);
       setStatus(null);

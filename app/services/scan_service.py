@@ -39,7 +39,7 @@ class ScanService:
         """Background task to execute scan."""
         try:
             for s in servers:
-                s["name"] = s.get("name") or s.get("host", "unknown")
+                s["name"] = (s.get("host_name") or s.get("host") or "unknown").strip() or s.get("host", "unknown")
             results = run_scan(
                 servers=servers,
                 tests=[],

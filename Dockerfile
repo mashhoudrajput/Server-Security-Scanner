@@ -10,10 +10,13 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Create non-root user (no shell, no SSH)
+RUN adduser --disabled-password --gecos "" --no-create-home appuser
+
 # Enable non-free for nikto
 RUN sed -i 's/Components: main/Components: main non-free/' /etc/apt/sources.list.d/debian.sources
 
-# WeasyPrint + fonts + security tools (no SSH/openssh-server)
+# WeasyPrint + fonts + security tools (no openssh-server)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpango-1.0-0 \
     libpangocairo-1.0-0 \
@@ -45,19 +48,12 @@ COPY reports/ ./reports/
 # Copy React build from stage 1
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
-# Create non-root user (fixed UID for volume permissions; no shell - prevents exec/ssh abuse)
-RUN groupadd -r -g 999 appuser && useradd -r -u 999 -g appuser -s /usr/sbin/nologin -d /nonexistent appuser \
-    && chown -R appuser:appuser /app
-
-# Ensure reports is writable
-RUN mkdir -p /app/reports && chown appuser:appuser /app/reports
-
-EXPOSE 8000
+# Own reports dir for non-root writes
+RUN chown -R appuser:appuser /app/reports
 
 USER appuser
 
-# Prevent Python from writing .pyc (needed for read-only root)
-ENV PYTHONDONTWRITEBYTECODE=1
+EXPOSE 8000
 
-# Use exec form - no shell, PID 1 is uvicorn directly
+# Run as non-root; no shell/exec needed for normal operation
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

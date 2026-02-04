@@ -27,12 +27,6 @@ export function ServerForm({
     onServersChange(next);
   };
 
-  const handleNameChange = (index: number, name: string) => {
-    const next = [...servers];
-    next[index] = { ...next[index], name: name.trim() || undefined };
-    onServersChange(next);
-  };
-
   const handleUserChange = (index: number, user: string) => {
     const next = [...servers];
     next[index] = { ...next[index], user: user || "ubuntu" };
@@ -47,28 +41,36 @@ export function ServerForm({
     onServersChange(next);
   };
 
+  const handleHostNameChange = (index: number, hostName: string) => {
+    const next = [...servers];
+    next[index] = { ...next[index], hostName: hostName || undefined };
+    onServersChange(next);
+  };
+
   return (
     <section className="card scan-form">
       <h2>Add Server</h2>
       <div className="servers-header">
+        <span>Host name <em>(optional)</em></span>
         <span>Host</span>
-        <span>Name (optional)</span>
         <span>Username</span>
         <span>SSH Key</span>
+        <span></span>
       </div>
       {servers.map((server, index) => (
         <div key={index} className="server-row">
           <input
             type="text"
-            placeholder="IP or hostname"
-            value={server.host}
-            onChange={(e) => handleHostChange(index, e.target.value)}
+            placeholder="e.g. Production Server"
+            value={server.hostName ?? ""}
+            onChange={(e) => handleHostNameChange(index, e.target.value)}
+            className="host-name-input"
           />
           <input
             type="text"
-            placeholder="Display name"
-            value={server.name ?? ""}
-            onChange={(e) => handleNameChange(index, e.target.value)}
+            placeholder="IP or hostname"
+            value={server.host}
+            onChange={(e) => handleHostChange(index, e.target.value)}
           />
           <input
             type="text"

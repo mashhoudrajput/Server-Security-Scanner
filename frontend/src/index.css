@@ -208,6 +208,12 @@ body::before {
   text-transform: uppercase;
 }
 
+.servers-header em {
+  font-style: italic;
+  font-weight: 400;
+  text-transform: none;
+}
+
 .server-row {
   display: grid;
   grid-template-columns: 1fr 1fr 120px 160px auto;
@@ -548,11 +554,12 @@ body::before {
     grid-template-columns: 1fr 1fr;
   }
 
-  .servers-header span:nth-child(n+3) {
+  .servers-header span:nth-child(4),
+  .server-row .file-label {
     grid-column: 1 / -1;
   }
 
-  .server-row > *:nth-child(n+3) {
+  .server-row .btn-danger {
     grid-column: 1 / -1;
   }
 }

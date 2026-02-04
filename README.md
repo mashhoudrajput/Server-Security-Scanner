@@ -1,6 +1,6 @@
 # Server Security Scanner
 
-Web-based security scanner. Enter host, optional name, username, SSH key → click Scan → get PDF report.
+Web-based security scanner with modern luxury UI. Enter host, username, SSH key → click Scan → get elegant PDF report.
 
 ## Requirements
 
@@ -19,28 +19,17 @@ docker compose up --build
 
 ```bash
 docker build -t server-security-scanner .
-mkdir -p reports && chown 999:999 reports  # or chmod 777 reports
-docker run -d --network host --cap-add NET_RAW -v $(pwd)/reports:/app/reports \
-  --read-only --security-opt no-new-privileges:true \
-  --tmpfs /tmp:noexec,nosuid,size=64m \
-  server-security-scanner
+docker run -d --network host --cap-add NET_RAW -v $(pwd)/reports:/app/reports server-security-scanner
 ```
 
 Open http://localhost:8000
 
-## Security
-
-- **Non-root**: Runs as `appuser` (UID 999)
-- **No SSH**: No openssh-server in container
-- **Hardened**: Read-only root, no-new-privileges, minimal capabilities (NET_RAW only)
-- **No shell**: `nologin` shell prevents interactive exec
-
 ## Usage
 
-1. Add server: Host (IP), Name (optional display name), Username (default: ubuntu), SSH key (.pem)
+1. Add server: Host name (optional, e.g. "Production"), Host (IP), Username (default: ubuntu), SSH key (.pem)
 2. Click **Start Full Scan**
 3. Wait for completion
-4. Download PDF report (auto-generated, luxury-styled)
+4. Download PDF report (auto-generated, luxury aesthetic)
 
 ## What It Scans
 
@@ -79,5 +68,7 @@ Open http://localhost:8000
 ├── docker-compose.yml
 └── requirements.txt
 ```
+
+**Security:** Container runs as non-root user, no SSH server, `no-new-privileges` enabled.
 
 **Development:** Run `npm run dev` in `frontend/` for hot reload; backend at `http://localhost:8000`.
