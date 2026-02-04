@@ -53,12 +53,27 @@ Open http://localhost:8000
 - ZMap (subnet from host IP)
 - Vuls (requires separate setup)
 
-## Project
+## Project Structure
 
 ```
-├── app/           # FastAPI + scanner + report + static GUI
-├── reports/       # Generated PDFs
-├── Dockerfile
+├── app/                  # Backend (FastAPI)
+│   ├── api/              # API routes & schemas
+│   ├── core/              # Config
+│   ├── report/            # PDF generation
+│   ├── scanner/           # Security scan modules
+│   └── services/          # Business logic
+├── frontend/              # React (Vite + TypeScript)
+│   ├── src/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   └── types/
+│   └── package.json
+├── reports/               # Generated PDFs
+├── Dockerfile             # Single container (React + Python)
 ├── docker-compose.yml
 └── requirements.txt
 ```
+
+**Development:** Run `npm run dev` in `frontend/` for hot reload; backend at `http://localhost:8000`.

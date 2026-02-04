@@ -1,11 +1,19 @@
+# Stage 1: Build React frontend
+FROM node:20-alpine AS frontend-builder
+WORKDIR /app/frontend
+
+COPY frontend/ ./
+RUN npm install && npm run build
+
+# Stage 2: Python backend + frontend
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Enable non-free for nikto, then install WeasyPrint + Nikto + ZMap
+# Enable non-free for nikto
 RUN sed -i 's/Components: main/Components: main non-free/' /etc/apt/sources.list.d/debian.sources
 
-# WeasyPrint + fonts + Nikto + ZMap + Nmap + curl/unzip for Nuclei
+# WeasyPrint + fonts + security tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpango-1.0-0 \
     libpangocairo-1.0-0 \
@@ -22,7 +30,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Nuclei vulnerability scanner
+# Nuclei
 RUN curl -sL "https://github.com/projectdiscovery/nuclei/releases/download/v3.6.2/nuclei_3.6.2_linux_amd64.zip" -o /tmp/nuclei.zip \
     && unzip -o /tmp/nuclei.zip -d /usr/local/bin \
     && rm /tmp/nuclei.zip \
@@ -33,6 +41,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app/ ./app/
 COPY reports/ ./reports/
+
+# Copy React build from stage 1
+COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
 EXPOSE 8000
 

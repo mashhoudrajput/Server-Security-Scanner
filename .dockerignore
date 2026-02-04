@@ -6,3 +6,5 @@ __pycache__/
 *.md
 reports/*
 !reports/.gitkeep
+frontend/node_modules
+frontend/dist
