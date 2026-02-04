@@ -1,8 +1,20 @@
 services:
   scanner:
+    image: server-security-scanner:latest
     build: .
     network_mode: host
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:noexec,nosuid,size=64m
     volumes:
       - ./reports:/app/reports
     cap_add:
       - NET_RAW
+    cap_drop:
+      - ALL
+    # No stdin/TTY - hardens against interactive exec
+    stdin_open: false
+    tty: false
+    init: true

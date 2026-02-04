@@ -27,6 +27,12 @@ export function ServerForm({
     onServersChange(next);
   };
 
+  const handleNameChange = (index: number, name: string) => {
+    const next = [...servers];
+    next[index] = { ...next[index], name: name.trim() || undefined };
+    onServersChange(next);
+  };
+
   const handleUserChange = (index: number, user: string) => {
     const next = [...servers];
     next[index] = { ...next[index], user: user || "ubuntu" };
@@ -46,6 +52,7 @@ export function ServerForm({
       <h2>Add Server</h2>
       <div className="servers-header">
         <span>Host</span>
+        <span>Name (optional)</span>
         <span>Username</span>
         <span>SSH Key</span>
       </div>
@@ -56,6 +63,12 @@ export function ServerForm({
             placeholder="IP or hostname"
             value={server.host}
             onChange={(e) => handleHostChange(index, e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Display name"
+            value={server.name ?? ""}
+            onChange={(e) => handleNameChange(index, e.target.value)}
           />
           <input
             type="text"

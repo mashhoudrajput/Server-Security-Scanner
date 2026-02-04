@@ -7,6 +7,7 @@ class ServerInput(BaseModel):
     """Input for a single server to scan."""
 
     host: str
+    name: str | None = None  # Optional display name (defaults to host)
     user: str = "ubuntu"
     key_base64: str
 

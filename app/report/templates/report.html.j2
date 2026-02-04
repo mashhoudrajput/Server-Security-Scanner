@@ -11,7 +11,7 @@
     @page {
       @bottom-center {
         font-size: 8pt;
-        color: #64748b;
+        color: #78716c;
         content: "Page " counter(page) " of " counter(pages);
       }
     }
@@ -19,73 +19,88 @@
     body {
       font-family: 'Liberation Sans', 'DejaVu Sans', 'Segoe UI', system-ui, sans-serif;
       font-size: 10pt;
-      line-height: 1.5;
-      color: #1a1a1a;
+      line-height: 1.6;
+      color: #1c1917;
       margin: 0;
       padding: 0;
+      background: #fafaf9;
     }
     .cover-page {
       text-align: center;
       padding: 2.5cm 0;
       page-break-after: always;
+      background: linear-gradient(180deg, #fafaf9 0%, #f5f5f4 100%);
     }
     .cover-bar {
-      height: 4px;
-      background: linear-gradient(90deg, #1e40af, #3b82f6);
+      height: 3px;
+      background: linear-gradient(90deg, #c9a962, #e5d4a1);
       margin-bottom: 1.5cm;
+      width: 120px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cover-badge {
+      font-size: 8pt;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #c9a962;
+      margin-bottom: 0.8cm;
     }
     .cover h1 {
-      font-size: 26pt;
-      font-weight: 700;
-      color: #1e293b;
+      font-size: 24pt;
+      font-weight: 600;
+      color: #1c1917;
       margin: 0 0 0.5cm;
-      letter-spacing: -0.02em;
+      letter-spacing: 0.03em;
     }
     .cover .meta {
-      color: #64748b;
+      color: #78716c;
       font-size: 10pt;
       margin: 0.3cm 0;
+      letter-spacing: 0.02em;
     }
     .scorecard {
       display: flex;
       justify-content: center;
-      gap: 1cm;
+      gap: 0.8cm;
       margin: 1.5cm 0;
       flex-wrap: wrap;
     }
     .score-badge {
-      padding: 0.4cm 0.8cm;
-      border-radius: 20px;
-      font-size: 11pt;
+      padding: 0.35cm 0.75cm;
+      border-radius: 100px;
+      font-size: 10pt;
       font-weight: 600;
-      color: white;
+      letter-spacing: 0.05em;
     }
-    .score-pass { background: #059669; }
-    .score-warn { background: #d97706; }
-    .score-fail { background: #dc2626; }
+    .score-pass { background: #059669; color: white; }
+    .score-warn { background: #b45309; color: white; }
+    .score-fail { background: #dc2626; color: white; }
     .cover-footer {
       margin-top: 2cm;
       font-size: 8pt;
-      color: #94a3b8;
+      color: #a8a29e;
+      letter-spacing: 0.08em;
     }
     .section { margin-bottom: 1cm; page-break-inside: avoid; }
     .section h2 {
-      font-size: 14pt;
-      color: #1e40af;
-      border-bottom: 2px solid #e2e8f0;
+      font-size: 13pt;
+      color: #c9a962;
+      border-bottom: 1px solid rgba(201, 169, 98, 0.3);
       padding-bottom: 0.25cm;
       margin: 0 0 0.5cm;
       font-weight: 600;
+      letter-spacing: 0.04em;
     }
-    .section h3 { font-size: 11pt; margin: 0.4cm 0 0.2cm; color: #334155; font-weight: 600; }
+    .section h3 { font-size: 10pt; margin: 0.4cm 0 0.2cm; color: #44403c; font-weight: 600; }
     .server-card {
       background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      padding: 0.6cm;
+      border: 1px solid rgba(201, 169, 98, 0.2);
+      border-radius: 8px;
+      padding: 0.65cm;
       margin-bottom: 0.6cm;
       page-break-inside: avoid;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     .server-card.reachable { border-left: 4px solid #059669; }
     .server-card.unreachable { border-left: 4px solid #dc2626; }
@@ -93,50 +108,51 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.2cm 0;
-      border-bottom: 1px solid #f1f5f9;
+      padding: 0.25cm 0;
+      border-bottom: 1px solid #f5f5f4;
       font-size: 9pt;
     }
     .check-row:last-child { border-bottom: none; }
     .badge {
       display: inline-block;
-      padding: 0.1cm 0.35cm;
-      border-radius: 12px;
+      padding: 0.08cm 0.3cm;
+      border-radius: 4px;
       font-size: 8pt;
       font-weight: 600;
+      letter-spacing: 0.02em;
     }
-    .badge-pass { background: #d1fae5; color: #059669; }
+    .badge-pass { background: #d1fae5; color: #047857; }
     .badge-warn { background: #fef3c7; color: #b45309; }
-    .badge-fail { background: #fee2e2; color: #dc2626; }
-    .badge-info { background: #f1f5f9; color: #475569; }
-    .badge-n-a { background: #e2e8f0; color: #64748b; }
+    .badge-fail { background: #fee2e2; color: #b91c1c; }
+    .badge-info { background: #f5f5f4; color: #57534e; }
+    .badge-n-a { background: #e7e5e4; color: #78716c; }
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 9pt;
-      border-radius: 6px;
+      border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
     thead { display: table-header-group; }
-    th, td { border: 1px solid #e2e8f0; padding: 0.3cm; text-align: left; }
-    th { background: #1e40af; color: white; font-weight: 600; }
-    tr:nth-child(even) { background: #f8fafc; }
+    th, td { border: 1px solid rgba(201, 169, 98, 0.2); padding: 0.35cm; text-align: left; }
+    th { background: #1c1917; color: #e5d4a1; font-weight: 600; letter-spacing: 0.03em; }
+    tr:nth-child(even) { background: #fafaf9; }
     .raw-pre {
       font-family: 'Consolas', 'Monaco', monospace;
       font-size: 7pt;
       white-space: pre-wrap;
-      background: #f8fafc;
+      background: #fafaf9;
       padding: 0.35cm;
       border-radius: 4px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e7e5e4;
       max-height: 4cm;
       overflow: hidden;
     }
     .fixes-box {
       background: #fffbeb;
-      border: 1px solid #fcd34d;
-      border-radius: 4px;
+      border: 1px solid rgba(201, 169, 98, 0.4);
+      border-radius: 6px;
       padding: 0.35cm;
       margin-top: 0.25cm;
       font-size: 9pt;
@@ -153,16 +169,18 @@
     .report-footer {
       margin-top: 1.5cm;
       padding-top: 0.5cm;
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid rgba(201, 169, 98, 0.2);
       font-size: 8pt;
-      color: #94a3b8;
+      color: #a8a29e;
       text-align: center;
+      letter-spacing: 0.05em;
     }
   </style>
 </head>
 <body>
   <div class="cover-page">
     <div class="cover-bar"></div>
+    <p class="cover-badge">Enterprise Security</p>
     <div class="cover">
       <h1>Server Security Scan Report</h1>
       <p class="meta">Generated {{ timestamp }}</p>
@@ -184,12 +202,13 @@
     <h2>Executive Summary</h2>
     <table>
       <thead>
-        <tr><th>Host</th><th>User</th><th>Status</th><th>Checks</th></tr>
+        <tr><th>Host</th><th>Name</th><th>User</th><th>Status</th><th>Checks</th></tr>
       </thead>
       <tbody>
       {% for name, data in servers.items() %}
       <tr>
         <td>{{ data.get('host', name) }}</td>
+        <td>{{ name }}</td>
         <td>{{ data.get('user', 'ubuntu') }}</td>
         <td>{% if data.get('reachable') %}<span class="badge badge-pass">Reachable</span>{% else %}<span class="badge badge-fail">Unreachable</span>{% endif %}</td>
         <td>{{ data.get('checks', {})|length }} checks</td>

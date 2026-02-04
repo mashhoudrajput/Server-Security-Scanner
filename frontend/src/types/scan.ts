@@ -1,5 +1,6 @@
 export interface ServerInput {
   host: string;
+  name?: string;  // Optional display name (defaults to host)
   user: string;
   keyBase64: string | null;
   keyFileName?: string;

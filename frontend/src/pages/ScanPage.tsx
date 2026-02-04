@@ -36,6 +36,7 @@ export function ScanPage() {
   const handleStartScan = useCallback(async () => {
     const payload = validServers.map((s) => ({
       host: s.host.trim(),
+      name: s.name?.trim() || undefined,
       user: s.user.trim() || "ubuntu",
       key_base64: s.keyBase64!,
     }));
@@ -54,7 +55,7 @@ export function ScanPage() {
       <section className="card actions">
         <button
           type="button"
-          className="btn btn-primary btn-scan"
+          className={`btn btn-primary btn-scan ${canStartScan ? "btn-scan-ready" : ""}`}
           onClick={handleStartScan}
           disabled={!canStartScan}
         >
