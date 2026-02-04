@@ -17,7 +17,7 @@
     }
     * { box-sizing: border-box; }
     body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-family: 'Liberation Sans', 'DejaVu Sans', 'Segoe UI', system-ui, sans-serif;
       font-size: 10pt;
       line-height: 1.5;
       color: #1a1a1a;
@@ -209,7 +209,7 @@
     <div class="check-row">
       <span><strong>{{ check_name.replace('_', ' ').title() }}</strong></span>
       <span class="badge badge-{{ check_data.get('status', 'info') }}">
-        {{ check_data.get('status', 'info') }}{% if check_data.get('message') %} - {{ check_data.message[:50] }}{% elif check_data.get('findings') %} - {{ check_data.findings[0][:50] }}{% endif %}
+        {{ check_data.get('status', 'info') }}{% if check_data.get('message') %} - {{ (check_data.message|default(''))[:50] }}{% elif check_data.get('findings') %} - {{ (check_data.findings[0]|default(''))[:50] }}{% endif %}
       </span>
     </div>
     {% if check_data.get('packages') %}
@@ -222,13 +222,15 @@
     {% endif %}
     {% if check_data.get('ports') %}
     <h3>Open Ports (Listening)</h3>
-    <pre class="raw-pre">{{ check_data.ports|join('\n')[:2000] }}{% if check_data.ports|join('\n')|length > 2000 %}... (truncated){% endif %}</pre>
+    {% set ports_text = (check_data.ports|default([]))|join('\n') %}
+    <pre class="raw-pre">{{ ports_text[:2000] }}{% if ports_text|length > 2000 %}... (truncated){% endif %}</pre>
     {% endif %}
     {% if check_data.get('fixes') %}
     <div class="fixes-box"><strong>Recommended Fixes:</strong><ul>{% for f in check_data.fixes %}<li>{{ f }}</li>{% endfor %}</ul></div>
     {% endif %}
     {% if check_data.get('raw_preview') and not check_data.get('packages') and not check_data.get('ports') and not check_data.get('users') %}
-    <pre class="raw-pre">{{ check_data.raw_preview[:2000] }}{% if check_data.raw_preview|length > 2000 %}... (truncated){% endif %}</pre>
+    {% set raw_txt = check_data.raw_preview|default('') %}
+    <pre class="raw-pre">{{ raw_txt[:2000] }}{% if raw_txt|length > 2000 %}... (truncated){% endif %}</pre>
     {% endif %}
     {% endfor %}
     {% if data.get('lynis') and data.lynis.get('status') != 'n/a' %}
@@ -255,10 +257,12 @@
       {% if result.get('results') %}
         {% for r in result.results %}
           {% if r is string %}
-            <p class="finding-item">{{ r[:200] }}{% if r|length > 200 %}...{% endif %}</p>
+            {% set r_str = r|default('') %}
+            <p class="finding-item">{{ r_str[:200] }}{% if r_str|length > 200 %}...{% endif %}</p>
           {% else %}
+            {% set r_out = r.get('output') or r.get('raw') or '' %}
             <p><strong>{{ r.get('url', r.get('host', '')) }}</strong></p>
-            <pre class="raw-pre">{{ (r.get('output') or r.get('raw', ''))[:1500] }}</pre>
+            <pre class="raw-pre">{{ r_out[:1500] }}</pre>
           {% endif %}
         {% endfor %}
       {% endif %}
@@ -270,7 +274,8 @@
         {% endif %}
       {% endif %}
       {% if result.get('raw_preview') and not result.get('results') %}
-      <pre class="raw-pre">{{ result.raw_preview[:2000] }}</pre>
+      {% set rp = result.raw_preview|default('') %}
+      <pre class="raw-pre">{{ rp[:2000] }}</pre>
       {% endif %}
     </div>
     {% endfor %}

@@ -44,6 +44,8 @@ const progressText = document.getElementById('progress-text');
 const progressPct = document.getElementById('progress-pct');
 const reportPlaceholder = document.getElementById('report-placeholder');
 const downloadLink = document.getElementById('download-link');
+const downloadContainer = document.getElementById('download-container');
+const reportSection = document.getElementById('report-section');
 
 function getServers() {
   const rows = serversList.querySelectorAll('.server-row');
@@ -83,7 +85,7 @@ startScanBtn.addEventListener('click', async () => {
   progressText.textContent = 'Starting scan...';
   progressPct.textContent = '0%';
   reportPlaceholder.textContent = 'Scan in progress...';
-  downloadLink.classList.add('hidden');
+  downloadContainer.classList.add('hidden');
 
   try {
     const res = await fetch(`${API}/scan`, {
@@ -137,17 +139,19 @@ async function autoGenerateReport() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ job_id: currentJobId }),
     });
-    const data = await res.json();
-    if (res.ok) {
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.filename) {
       downloadLink.href = `${API}/report/download/${data.filename}`;
       downloadLink.download = data.filename;
-      downloadLink.classList.remove('hidden');
-      reportPlaceholder.textContent = 'Report ready. Click to download.';
+      downloadContainer.classList.remove('hidden');
+      reportPlaceholder.textContent = 'Report ready.';
+      reportSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } else {
-      reportPlaceholder.textContent = 'Report generation failed.';
+      const errMsg = data.detail || data.message || (typeof data === 'string' ? data : '');
+      reportPlaceholder.textContent = 'Report generation failed.' + (errMsg ? ' ' + errMsg : '');
     }
   } catch (err) {
-    reportPlaceholder.textContent = 'Report generation failed.';
+    reportPlaceholder.textContent = 'Report generation failed. ' + (err.message || '');
   }
 }
 

@@ -112,7 +112,7 @@ def generate_report(req: ReportRequest):
         generate_pdf_report(data, str(filepath))
         return {"filename": filename}
     except Exception as e:
-        raise HTTPException(500, f"Report generation failed: {e}")
+        raise HTTPException(500, f"Report generation failed: {str(e)}")
 
 
 @app.get("/api/report/download/{filename}")

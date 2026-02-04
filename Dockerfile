@@ -5,13 +5,16 @@ WORKDIR /app
 # Enable non-free for nikto, then install WeasyPrint + Nikto + ZMap
 RUN sed -i 's/Components: main/Components: main non-free/' /etc/apt/sources.list.d/debian.sources
 
-# WeasyPrint + Nikto + ZMap + Nmap + curl/unzip for Nuclei
+# WeasyPrint + fonts + Nikto + ZMap + Nmap + curl/unzip for Nuclei
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpango-1.0-0 \
     libpangocairo-1.0-0 \
     libgdk-pixbuf-2.0-0 \
     libffi-dev \
     shared-mime-info \
+    fontconfig \
+    fonts-liberation \
+    fonts-dejavu-core \
     zmap \
     nikto \
     nmap \
