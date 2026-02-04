@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Server Security Scan Report</title>
+  <style>
+    @page { size: A4; margin: 2cm; }
+    * { box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10pt; line-height: 1.5; color: #1a1a1a; margin: 0; padding: 0; }
+    .cover { text-align: center; padding: 2cm 0; border-bottom: 2px solid #2563eb; margin-bottom: 1.5cm; }
+    .cover h1 { font-size: 22pt; color: #1e40af; margin: 0 0 0.5cm; }
+    .cover .meta { color: #64748b; font-size: 9pt; }
+    .section { margin-bottom: 1cm; page-break-inside: avoid; }
+    .section h2 { font-size: 13pt; color: #1e40af; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.2cm; margin: 0 0 0.4cm; }
+    .section h3 { font-size: 11pt; margin: 0.3cm 0 0.2cm; color: #334155; }
+    .server-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 0.5cm; margin-bottom: 0.5cm; page-break-inside: avoid; }
+    .check-row { display: flex; justify-content: space-between; padding: 0.15cm 0; border-bottom: 1px dotted #e2e8f0; font-size: 9pt; }
+    .check-row:last-child { border-bottom: none; }
+    .status-pass { color: #059669; font-weight: 600; }
+    .status-warn { color: #d97706; font-weight: 600; }
+    .status-fail { color: #dc2626; font-weight: 600; }
+    .status-n-a { color: #64748b; }
+    .status-error { color: #dc2626; }
+    table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+    th, td { border: 1px solid #e2e8f0; padding: 0.25cm; text-align: left; }
+    th { background: #f1f5f9; font-weight: 600; }
+    .raw-pre { font-family: monospace; font-size: 7pt; white-space: pre-wrap; background: #f1f5f9; padding: 0.25cm; border-radius: 2px; max-height: 5cm; overflow: auto; }
+    .fixes-box { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 4px; padding: 0.3cm; margin-top: 0.2cm; font-size: 9pt; }
+    .fixes-box ul { margin: 0.1cm 0 0 0.5cm; padding: 0; }
+    .packages-list { font-family: monospace; font-size: 7pt; column-count: 2; column-gap: 0.5cm; }
+    footer { margin-top: 1.5cm; font-size: 8pt; color: #94a3b8; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="cover">
+    <h1>Server Security Scan Report</h1>
+    <p class="meta">Generated {{ timestamp }}</p>
+    <p class="meta">{{ server_count }} server(s) scanned</p>
+    {% if error %}<p class="status-fail">Error: {{ error }}</p>{% endif %}
+  </div>
+
+  {% if not error %}
+  <div class="section">
+    <h2>Executive Summary</h2>
+    <table>
+      <tr><th>Host</th><th>User</th><th>Reachable</th><th>Checks</th></tr>
+      {% for name, data in servers.items() %}
+      <tr>
+        <td>{{ data.get('host', name) }}</td>
+        <td>{{ data.get('user', 'ubuntu') }}</td>
+        <td class="{% if data.get('reachable') %}status-pass{% else %}status-fail{% endif %}">{% if data.get('reachable') %}Yes{% else %}No{% endif %}</td>
+        <td>{{ data.get('checks', {})|length }} checks</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  {% for name, data in servers.items() %}
+  <div class="section server-card">
+    <h2>{{ data.get('host', name) }} ({{ data.get('user', 'ubuntu') }})</h2>
+    {% if data.get('error') %}
+    <p class="status-error">Error: {{ data.error }}</p>
+    {% else %}
+    {% for check_name, check_data in data.get('checks', {}).items() %}
+    <div class="check-row">
+      <span><strong>{{ check_name.replace('_', ' ').title() }}</strong></span>
+      <span class="status-{{ check_data.get('status', 'info') }}">
+        {{ check_data.get('status', 'info') }}{% if check_data.get('message') %} - {{ check_data.message }}{% elif check_data.get('findings') %} - {{ check_data.findings[0] }}{% endif %}
+      </span>
+    </div>
+    {% if check_data.get('packages') %}
+    <h3>Pending Updates ({{ check_data.packages|length }} packages)</h3>
+    <div class="packages-list">{{ check_data.packages|join(', ') }}</div>
+    {% endif %}
+    {% if check_data.get('ports') %}
+    <h3>Open Ports (Listening)</h3>
+    <pre class="raw-pre">{{ check_data.ports|join('\n') }}</pre>
+    {% endif %}
+    {% if check_data.get('fixes') %}
+    <div class="fixes-box"><strong>Recommended Fixes:</strong><ul>{% for f in check_data.fixes %}<li>{{ f }}</li>{% endfor %}</ul></div>
+    {% endif %}
+    {% if check_data.get('raw_preview') and not check_data.get('packages') and not check_data.get('ports') %}
+    <pre class="raw-pre">{{ check_data.raw_preview }}</pre>
+    {% endif %}
+    {% endfor %}
+    {% if data.get('lynis') and data.lynis.get('status') != 'n/a' %}
+    <h3>Lynis</h3>
+    <p>Hardening Index: {{ data.lynis.get('hardening_index', 'N/A') }}</p>
+    {% if data.lynis.get('warnings') %}
+    <p><strong>Warnings:</strong></p><ul>{% for w in data.lynis.warnings[:10] %}<li>{{ w }}</li>{% endfor %}</ul>
+    {% endif %}
+    {% if data.lynis.get('suggestions') %}
+    <p><strong>Suggestions:</strong></p><ul>{% for s in data.lynis.suggestions[:10] %}<li>{{ s }}</li>{% endfor %}</ul>
+    {% endif %}
+    {% endif %}
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  {% if network_scans %}
+  <div class="section">
+    <h2>Network Scans</h2>
+    {% for tool, result in network_scans.items() %}
+    <div class="server-card">
+      <h3>{{ tool|upper }}</h3>
+      <p>{{ result.get('message', result.get('status', '')) }}</p>
+      {% if result.get('results') %}{% for r in result.results %}<p><strong>{{ r.get('url', '') }}</strong></p><pre class="raw-pre">{{ r.get('output', '')[:1500] }}</pre>{% endfor %}{% endif %}
+      {% if result.get('ports') %}{% for port, ips in result.ports.items() %}<p>Port {{ port }}: {{ ips|length }} hosts</p>{% endfor %}{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endif %}
+  <footer>Server Security Scanner - Report generated automatically. Do not distribute.</footer>
+</body>
+</html>

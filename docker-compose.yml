@@ -1,0 +1,8 @@
+services:
+  scanner:
+    build: .
+    network_mode: host
+    volumes:
+      - ./reports:/app/reports
+    cap_add:
+      - NET_RAW

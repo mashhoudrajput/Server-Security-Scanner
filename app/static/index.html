@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Server Security Scanner</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>Server Security Scanner</h1>
+      <p class="subtitle">Enter host, username, key — click Scan — get full report</p>
+    </header>
+
+    <main class="main">
+      <section class="card scan-form">
+        <h2>Add Server</h2>
+        <div class="servers-header">
+          <span>Host</span>
+          <span>Username</span>
+          <span>SSH Key</span>
+        </div>
+        <div id="servers-list"></div>
+        <button type="button" class="btn btn-secondary" id="add-server">+ Add Another Server</button>
+      </section>
+
+      <section class="card actions">
+        <button type="button" class="btn btn-primary btn-scan" id="start-scan" disabled>
+          <span class="btn-text">Start Full Scan</span>
+          <span class="btn-desc">Runs all security checks automatically</span>
+        </button>
+        <div id="progress-container" class="hidden">
+          <div class="progress-info">
+            <span id="progress-text">Initializing...</span>
+            <span id="progress-pct">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        </div>
+      </section>
+
+      <section class="card" id="results-section">
+        <h2>Results</h2>
+        <div id="results-placeholder" class="hint">Enter server details and click Start Full Scan.</div>
+        <div id="results-content" class="hidden"></div>
+      </section>
+
+      <section class="card report-section" id="report-section">
+        <h2>Report</h2>
+        <div id="report-placeholder" class="hint">Report will be generated automatically when scan completes.</div>
+        <a id="download-link" class="btn btn-success download-btn hidden" href="#" download>
+          Download PDF Report
+        </a>
+      </section>
+    </main>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
