@@ -216,6 +216,10 @@
     <h3>Pending Updates ({{ check_data.packages|length }} packages)</h3>
     <div class="packages-list">{{ check_data.packages|join(', ') }}</div>
     {% endif %}
+    {% if check_data.get('users') %}
+    <h3>Sudo Users</h3>
+    <p>{{ check_data.users|join(', ') }}</p>
+    {% endif %}
     {% if check_data.get('ports') %}
     <h3>Open Ports (Listening)</h3>
     <pre class="raw-pre">{{ check_data.ports|join('\n')[:2000] }}{% if check_data.ports|join('\n')|length > 2000 %}... (truncated){% endif %}</pre>
@@ -223,7 +227,7 @@
     {% if check_data.get('fixes') %}
     <div class="fixes-box"><strong>Recommended Fixes:</strong><ul>{% for f in check_data.fixes %}<li>{{ f }}</li>{% endfor %}</ul></div>
     {% endif %}
-    {% if check_data.get('raw_preview') and not check_data.get('packages') and not check_data.get('ports') %}
+    {% if check_data.get('raw_preview') and not check_data.get('packages') and not check_data.get('ports') and not check_data.get('users') %}
     <pre class="raw-pre">{{ check_data.raw_preview[:2000] }}{% if check_data.raw_preview|length > 2000 %}... (truncated){% endif %}</pre>
     {% endif %}
     {% endfor %}
@@ -248,8 +252,26 @@
     <div class="server-card">
       <h3>{{ tool|upper }}</h3>
       <p>{{ result.get('message', result.get('status', '')) }}</p>
-      {% if result.get('results') %}{% for r in result.results %}<p><strong>{{ r.get('url', '') }}</strong></p><pre class="raw-pre">{{ r.get('output', '')[:1500] }}</pre>{% endfor %}{% endif %}
-      {% if result.get('ports') %}{% for port, ips in result.ports.items() %}<p>Port {{ port }}: {{ ips|length }} hosts</p>{% endfor %}{% endif %}
+      {% if result.get('results') %}
+        {% for r in result.results %}
+          {% if r is string %}
+            <p class="finding-item">{{ r[:200] }}{% if r|length > 200 %}...{% endif %}</p>
+          {% else %}
+            <p><strong>{{ r.get('url', r.get('host', '')) }}</strong></p>
+            <pre class="raw-pre">{{ (r.get('output') or r.get('raw', ''))[:1500] }}</pre>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      {% if result.get('ports') %}
+        {% if result.ports is mapping %}
+          {% for port, ips in result.ports.items() %}<p>Port {{ port }}: {{ ips|length }} hosts</p>{% endfor %}
+        {% else %}
+          <p>Ports scanned: {{ result.ports }}</p>
+        {% endif %}
+      {% endif %}
+      {% if result.get('raw_preview') and not result.get('results') %}
+      <pre class="raw-pre">{{ result.raw_preview[:2000] }}</pre>
+      {% endif %}
     </div>
     {% endfor %}
   </div>

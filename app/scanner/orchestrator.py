@@ -12,12 +12,17 @@ from .builtin import run_builtin_checks
 from .executor import SSHExecutor
 from .lynis import run_lynis
 from .nikto import run_nikto
+from .nmap import run_nmap
+from .nuclei import run_nuclei
 from .openvas import run_openvas
 from .vuls import run_vuls
 from .zmap import run_zmap
 
-BUILTIN_TESTS = {"ssh_config", "firewall", "fail2ban", "updates", "open_ports", "disk_usage", "last_login"}
-ALL_TESTS = list(BUILTIN_TESTS) + ["lynis", "vuls", "nikto", "zmap"]
+BUILTIN_TESTS = {
+    "ssh_config", "firewall", "fail2ban", "updates", "open_ports", "disk_usage", "last_login",
+    "clamav", "rkhunter", "chkrootkit", "auditd", "apparmor", "unattended_upgrades", "sudo_users", "ssl_cert",
+}
+ALL_TESTS = list(BUILTIN_TESTS) + ["lynis", "vuls", "nikto", "zmap", "nmap", "nuclei"]
 
 
 def _derive_subnet(host: str) -> str | None:
@@ -84,6 +89,10 @@ def run_scan(
         total_steps += 1
     if "zmap" in tests and subnet:
         total_steps += 1
+    if "nmap" in tests and servers:
+        total_steps += 1
+    if "nuclei" in tests and urls:
+        total_steps += 1
     if "openvas" in tests and openvas_config:
         total_steps += 1
     total_steps = max(total_steps, 1)
@@ -149,6 +158,18 @@ def run_scan(
     # ZMap
     if "zmap" in tests and subnet:
         results["network_scans"]["zmap"] = run_zmap(subnet)
+        update_progress()
+
+    # Nmap
+    if "nmap" in tests and servers:
+        hosts = [s.get("host", "").strip() for s in servers if s.get("host", "").strip()]
+        if hosts:
+            results["network_scans"]["nmap"] = run_nmap(hosts)
+        update_progress()
+
+    # Nuclei
+    if "nuclei" in tests and urls:
+        results["network_scans"]["nuclei"] = run_nuclei(urls)
         update_progress()
 
     # OpenVAS

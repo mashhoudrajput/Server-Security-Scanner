@@ -40,9 +40,16 @@ Open http://localhost:8000
 
 ## What It Scans
 
+**On-target (via SSH):**
 - SSH config, firewall, fail2ban, updates, open ports, disk usage, last logins
+- ClamAV, rkhunter, chkrootkit (if installed on target)
+- auditd, AppArmor, unattended-upgrades, sudo users, SSL cert
 - Lynis (if installed on target)
+
+**From scanner:**
+- Nmap (port/service scan)
 - Nikto (HTTP/HTTPS on host)
+- Nuclei (template-based vulnerability scan)
 - ZMap (subnet from host IP)
 - Vuls (requires separate setup)
 
