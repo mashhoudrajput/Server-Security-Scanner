@@ -4,68 +4,212 @@
   <meta charset="UTF-8">
   <title>Server Security Scan Report</title>
   <style>
-    @page { size: A4; margin: 2cm; }
+    @page {
+      size: A4;
+      margin: 2cm;
+    }
+    @page {
+      @bottom-center {
+        font-size: 8pt;
+        color: #64748b;
+        content: "Page " counter(page) " of " counter(pages);
+      }
+    }
     * { box-sizing: border-box; }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10pt; line-height: 1.5; color: #1a1a1a; margin: 0; padding: 0; }
-    .cover { text-align: center; padding: 2cm 0; border-bottom: 2px solid #2563eb; margin-bottom: 1.5cm; }
-    .cover h1 { font-size: 22pt; color: #1e40af; margin: 0 0 0.5cm; }
-    .cover .meta { color: #64748b; font-size: 9pt; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 10pt;
+      line-height: 1.5;
+      color: #1a1a1a;
+      margin: 0;
+      padding: 0;
+    }
+    .cover-page {
+      text-align: center;
+      padding: 2.5cm 0;
+      page-break-after: always;
+    }
+    .cover-bar {
+      height: 4px;
+      background: linear-gradient(90deg, #1e40af, #3b82f6);
+      margin-bottom: 1.5cm;
+    }
+    .cover h1 {
+      font-size: 26pt;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0 0 0.5cm;
+      letter-spacing: -0.02em;
+    }
+    .cover .meta {
+      color: #64748b;
+      font-size: 10pt;
+      margin: 0.3cm 0;
+    }
+    .scorecard {
+      display: flex;
+      justify-content: center;
+      gap: 1cm;
+      margin: 1.5cm 0;
+      flex-wrap: wrap;
+    }
+    .score-badge {
+      padding: 0.4cm 0.8cm;
+      border-radius: 20px;
+      font-size: 11pt;
+      font-weight: 600;
+      color: white;
+    }
+    .score-pass { background: #059669; }
+    .score-warn { background: #d97706; }
+    .score-fail { background: #dc2626; }
+    .cover-footer {
+      margin-top: 2cm;
+      font-size: 8pt;
+      color: #94a3b8;
+    }
     .section { margin-bottom: 1cm; page-break-inside: avoid; }
-    .section h2 { font-size: 13pt; color: #1e40af; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.2cm; margin: 0 0 0.4cm; }
-    .section h3 { font-size: 11pt; margin: 0.3cm 0 0.2cm; color: #334155; }
-    .server-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 0.5cm; margin-bottom: 0.5cm; page-break-inside: avoid; }
-    .check-row { display: flex; justify-content: space-between; padding: 0.15cm 0; border-bottom: 1px dotted #e2e8f0; font-size: 9pt; }
+    .section h2 {
+      font-size: 14pt;
+      color: #1e40af;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.25cm;
+      margin: 0 0 0.5cm;
+      font-weight: 600;
+    }
+    .section h3 { font-size: 11pt; margin: 0.4cm 0 0.2cm; color: #334155; font-weight: 600; }
+    .server-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 0.6cm;
+      margin-bottom: 0.6cm;
+      page-break-inside: avoid;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .server-card.reachable { border-left: 4px solid #059669; }
+    .server-card.unreachable { border-left: 4px solid #dc2626; }
+    .check-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.2cm 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 9pt;
+    }
     .check-row:last-child { border-bottom: none; }
-    .status-pass { color: #059669; font-weight: 600; }
-    .status-warn { color: #d97706; font-weight: 600; }
-    .status-fail { color: #dc2626; font-weight: 600; }
-    .status-n-a { color: #64748b; }
-    .status-error { color: #dc2626; }
-    table { width: 100%; border-collapse: collapse; font-size: 9pt; }
-    th, td { border: 1px solid #e2e8f0; padding: 0.25cm; text-align: left; }
-    th { background: #f1f5f9; font-weight: 600; }
-    .raw-pre { font-family: monospace; font-size: 7pt; white-space: pre-wrap; background: #f1f5f9; padding: 0.25cm; border-radius: 2px; max-height: 5cm; overflow: auto; }
-    .fixes-box { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 4px; padding: 0.3cm; margin-top: 0.2cm; font-size: 9pt; }
-    .fixes-box ul { margin: 0.1cm 0 0 0.5cm; padding: 0; }
-    .packages-list { font-family: monospace; font-size: 7pt; column-count: 2; column-gap: 0.5cm; }
-    footer { margin-top: 1.5cm; font-size: 8pt; color: #94a3b8; text-align: center; }
+    .badge {
+      display: inline-block;
+      padding: 0.1cm 0.35cm;
+      border-radius: 12px;
+      font-size: 8pt;
+      font-weight: 600;
+    }
+    .badge-pass { background: #d1fae5; color: #059669; }
+    .badge-warn { background: #fef3c7; color: #b45309; }
+    .badge-fail { background: #fee2e2; color: #dc2626; }
+    .badge-info { background: #f1f5f9; color: #475569; }
+    .badge-n-a { background: #e2e8f0; color: #64748b; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9pt;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    thead { display: table-header-group; }
+    th, td { border: 1px solid #e2e8f0; padding: 0.3cm; text-align: left; }
+    th { background: #1e40af; color: white; font-weight: 600; }
+    tr:nth-child(even) { background: #f8fafc; }
+    .raw-pre {
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 7pt;
+      white-space: pre-wrap;
+      background: #f8fafc;
+      padding: 0.35cm;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+      max-height: 4cm;
+      overflow: hidden;
+    }
+    .fixes-box {
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: 4px;
+      padding: 0.35cm;
+      margin-top: 0.25cm;
+      font-size: 9pt;
+    }
+    .fixes-box strong { color: #b45309; }
+    .fixes-box ul { margin: 0.2cm 0 0 0.6cm; padding: 0; }
+    .packages-list {
+      font-family: 'Consolas', monospace;
+      font-size: 7pt;
+      column-count: 2;
+      column-gap: 0.6cm;
+      line-height: 1.4;
+    }
+    .report-footer {
+      margin-top: 1.5cm;
+      padding-top: 0.5cm;
+      border-top: 1px solid #e2e8f0;
+      font-size: 8pt;
+      color: #94a3b8;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
-  <div class="cover">
-    <h1>Server Security Scan Report</h1>
-    <p class="meta">Generated {{ timestamp }}</p>
-    <p class="meta">{{ server_count }} server(s) scanned</p>
-    {% if error %}<p class="status-fail">Error: {{ error }}</p>{% endif %}
+  <div class="cover-page">
+    <div class="cover-bar"></div>
+    <div class="cover">
+      <h1>Server Security Scan Report</h1>
+      <p class="meta">Generated {{ timestamp }}</p>
+      <p class="meta">{{ server_count }} server(s) scanned</p>
+      {% if summary %}
+      <div class="scorecard">
+        <span class="score-badge score-pass">Pass: {{ summary.pass }}</span>
+        <span class="score-badge score-warn">Warn: {{ summary.warn }}</span>
+        <span class="score-badge score-fail">Fail: {{ summary.fail }}</span>
+      </div>
+      {% endif %}
+      {% if error %}<p style="color:#dc2626;font-weight:600;">Error: {{ error }}</p>{% endif %}
+    </div>
+    <p class="cover-footer">Confidential - Internal Use Only</p>
   </div>
 
   {% if not error %}
   <div class="section">
     <h2>Executive Summary</h2>
     <table>
-      <tr><th>Host</th><th>User</th><th>Reachable</th><th>Checks</th></tr>
+      <thead>
+        <tr><th>Host</th><th>User</th><th>Status</th><th>Checks</th></tr>
+      </thead>
+      <tbody>
       {% for name, data in servers.items() %}
       <tr>
         <td>{{ data.get('host', name) }}</td>
         <td>{{ data.get('user', 'ubuntu') }}</td>
-        <td class="{% if data.get('reachable') %}status-pass{% else %}status-fail{% endif %}">{% if data.get('reachable') %}Yes{% else %}No{% endif %}</td>
+        <td>{% if data.get('reachable') %}<span class="badge badge-pass">Reachable</span>{% else %}<span class="badge badge-fail">Unreachable</span>{% endif %}</td>
         <td>{{ data.get('checks', {})|length }} checks</td>
       </tr>
       {% endfor %}
+      </tbody>
     </table>
   </div>
 
   {% for name, data in servers.items() %}
-  <div class="section server-card">
+  <div class="section server-card {% if data.get('reachable') %}reachable{% else %}unreachable{% endif %}">
     <h2>{{ data.get('host', name) }} ({{ data.get('user', 'ubuntu') }})</h2>
     {% if data.get('error') %}
-    <p class="status-error">Error: {{ data.error }}</p>
+    <p style="color:#dc2626;font-weight:600;">Error: {{ data.error }}</p>
     {% else %}
     {% for check_name, check_data in data.get('checks', {}).items() %}
     <div class="check-row">
       <span><strong>{{ check_name.replace('_', ' ').title() }}</strong></span>
-      <span class="status-{{ check_data.get('status', 'info') }}">
-        {{ check_data.get('status', 'info') }}{% if check_data.get('message') %} - {{ check_data.message }}{% elif check_data.get('findings') %} - {{ check_data.findings[0] }}{% endif %}
+      <span class="badge badge-{{ check_data.get('status', 'info') }}">
+        {{ check_data.get('status', 'info') }}{% if check_data.get('message') %} - {{ check_data.message[:50] }}{% elif check_data.get('findings') %} - {{ check_data.findings[0][:50] }}{% endif %}
       </span>
     </div>
     {% if check_data.get('packages') %}
@@ -74,18 +218,18 @@
     {% endif %}
     {% if check_data.get('ports') %}
     <h3>Open Ports (Listening)</h3>
-    <pre class="raw-pre">{{ check_data.ports|join('\n') }}</pre>
+    <pre class="raw-pre">{{ check_data.ports|join('\n')[:2000] }}{% if check_data.ports|join('\n')|length > 2000 %}... (truncated){% endif %}</pre>
     {% endif %}
     {% if check_data.get('fixes') %}
     <div class="fixes-box"><strong>Recommended Fixes:</strong><ul>{% for f in check_data.fixes %}<li>{{ f }}</li>{% endfor %}</ul></div>
     {% endif %}
     {% if check_data.get('raw_preview') and not check_data.get('packages') and not check_data.get('ports') %}
-    <pre class="raw-pre">{{ check_data.raw_preview }}</pre>
+    <pre class="raw-pre">{{ check_data.raw_preview[:2000] }}{% if check_data.raw_preview|length > 2000 %}... (truncated){% endif %}</pre>
     {% endif %}
     {% endfor %}
     {% if data.get('lynis') and data.lynis.get('status') != 'n/a' %}
     <h3>Lynis</h3>
-    <p>Hardening Index: {{ data.lynis.get('hardening_index', 'N/A') }}</p>
+    <p>Hardening Index: <strong>{{ data.lynis.get('hardening_index', 'N/A') }}</strong></p>
     {% if data.lynis.get('warnings') %}
     <p><strong>Warnings:</strong></p><ul>{% for w in data.lynis.warnings[:10] %}<li>{{ w }}</li>{% endfor %}</ul>
     {% endif %}
@@ -111,6 +255,6 @@
   </div>
   {% endif %}
   {% endif %}
-  <footer>Server Security Scanner - Report generated automatically. Do not distribute.</footer>
+  <div class="report-footer">Server Security Scanner - Report generated automatically. Do not distribute.</div>
 </body>
 </html>

@@ -9,6 +9,13 @@ Web-based security scanner. Enter host, username, SSH key → click Scan → get
 
 ## Run
 
+**Using Docker Hub (quick start):**
+
+```bash
+docker pull mashhoud/server-security-scanner:latest
+docker run -d --network host --cap-add NET_RAW -v $(pwd)/reports:/app/reports mashhoud/server-security-scanner:latest
+```
+
 **Using docker-compose (recommended):**
 
 ```bash
