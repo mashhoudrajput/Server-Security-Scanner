@@ -2,11 +2,7 @@ services:
   scanner:
     build: .
     network_mode: host
-    tmpfs:
-      - /tmp
     volumes:
       - ./reports:/app/reports
     cap_add:
       - NET_RAW
-    security_opt:
-      - no-new-privileges:true

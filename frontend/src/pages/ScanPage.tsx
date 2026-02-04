@@ -8,6 +8,7 @@ import type { ServerInput } from "../types/scan";
 
 const INITIAL_SERVER: ServerInput = {
   host: "",
+  hostName: undefined,
   user: "ubuntu",
   keyBase64: null,
 };
@@ -36,9 +37,9 @@ export function ScanPage() {
   const handleStartScan = useCallback(async () => {
     const payload = validServers.map((s) => ({
       host: s.host.trim(),
+      host_name: s.hostName?.trim() || undefined,
       user: s.user.trim() || "ubuntu",
       key_base64: s.keyBase64!,
-      host_name: s.hostName?.trim() || undefined,
     }));
     await startScan(payload);
   }, [validServers, startScan]);

@@ -197,7 +197,7 @@ body::before {
 /* Server form */
 .servers-header {
   display: grid;
-  grid-template-columns: 1fr 1fr 120px 160px auto;
+  grid-template-columns: 1fr 140px 120px 160px auto;
   gap: 1rem;
   align-items: center;
   font-size: 0.75rem;
@@ -208,15 +208,9 @@ body::before {
   text-transform: uppercase;
 }
 
-.servers-header em {
-  font-style: italic;
-  font-weight: 400;
-  text-transform: none;
-}
-
 .server-row {
   display: grid;
-  grid-template-columns: 1fr 1fr 120px 160px auto;
+  grid-template-columns: 1fr 140px 120px 160px auto;
   gap: 1rem;
   align-items: center;
   margin-bottom: 1rem;
@@ -540,6 +534,18 @@ body::before {
 }
 
 /* Responsive */
+@media (max-width: 900px) {
+  .servers-header,
+  .server-row {
+    grid-template-columns: 1fr 1fr 1fr auto;
+  }
+
+  .servers-header span:nth-child(2),
+  .server-row input:nth-of-type(2) {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 640px) {
   .app {
     padding: 2rem 1.25rem;
@@ -554,12 +560,10 @@ body::before {
     grid-template-columns: 1fr 1fr;
   }
 
-  .servers-header span:nth-child(4),
+  .servers-header span:nth-child(n+2),
+  .server-row input:nth-of-type(2),
+  .server-row input:nth-of-type(3),
   .server-row .file-label {
-    grid-column: 1 / -1;
-  }
-
-  .server-row .btn-danger {
     grid-column: 1 / -1;
   }
 }

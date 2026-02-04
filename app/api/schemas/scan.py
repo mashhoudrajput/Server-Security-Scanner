@@ -7,9 +7,9 @@ class ServerInput(BaseModel):
     """Input for a single server to scan."""
 
     host: str
+    host_name: str | None = None
     user: str = "ubuntu"
     key_base64: str
-    host_name: str | None = None  # Optional display name (e.g. "Production Server")
 
 
 class ScanRequest(BaseModel):

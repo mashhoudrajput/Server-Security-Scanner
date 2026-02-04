@@ -51,26 +51,24 @@ export function ServerForm({
     <section className="card scan-form">
       <h2>Add Server</h2>
       <div className="servers-header">
-        <span>Host name <em>(optional)</em></span>
         <span>Host</span>
+        <span>Host name (optional)</span>
         <span>Username</span>
         <span>SSH Key</span>
-        <span></span>
       </div>
       {servers.map((server, index) => (
         <div key={index} className="server-row">
           <input
             type="text"
-            placeholder="e.g. Production Server"
-            value={server.hostName ?? ""}
-            onChange={(e) => handleHostNameChange(index, e.target.value)}
-            className="host-name-input"
-          />
-          <input
-            type="text"
             placeholder="IP or hostname"
             value={server.host}
             onChange={(e) => handleHostChange(index, e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="e.g. Production"
+            value={server.hostName ?? ""}
+            onChange={(e) => handleHostNameChange(index, e.target.value)}
           />
           <input
             type="text"

@@ -12,7 +12,7 @@
       @bottom-center {
         font-size: 8pt;
         color: #78716c;
-        content: "Page " counter(page) " of " counter(pages);
+        content: "Page " counter(page) " of " counter(pages) " — Server Security Scanner";
       }
     }
     * { box-sizing: border-box; }
@@ -20,42 +20,41 @@
       font-family: 'Liberation Sans', 'DejaVu Sans', 'Segoe UI', system-ui, sans-serif;
       font-size: 10pt;
       line-height: 1.6;
-      color: #1a1a1a;
+      color: #1c1917;
       margin: 0;
       padding: 0;
-      background: #faf9f7;
+      background: #fafaf9;
     }
     .cover-page {
       text-align: center;
       padding: 2.5cm 0;
       page-break-after: always;
-      background: linear-gradient(180deg, #faf9f7 0%, #f5f3ef 100%);
+      background: linear-gradient(180deg, #fafaf9 0%, #f5f5f4 100%);
     }
     .cover-bar {
-      height: 3px;
-      background: linear-gradient(90deg, transparent, #c9a962, #e5d4a1, transparent);
+      height: 5px;
+      background: linear-gradient(90deg, #a8a29e, #c9a962 50%, #e5d4a1);
       margin-bottom: 1.5cm;
-      opacity: 0.9;
+      border-radius: 3px;
     }
     .cover-badge {
       display: inline-block;
-      font-size: 7pt;
+      font-size: 8pt;
       font-weight: 600;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
       color: #c9a962;
       margin-bottom: 0.8cm;
-      border: 1px solid rgba(201, 169, 98, 0.4);
       padding: 0.2cm 0.6cm;
+      border: 1px solid rgba(201, 169, 98, 0.5);
       border-radius: 100px;
     }
     .cover h1 {
-      font-family: 'Liberation Serif', 'DejaVu Serif', Georgia, serif;
-      font-size: 24pt;
-      font-weight: 600;
-      color: #1a1a1a;
+      font-size: 28pt;
+      font-weight: 700;
+      color: #1c1917;
       margin: 0 0 0.5cm;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.02em;
     }
     .cover .meta {
       color: #78716c;
@@ -71,17 +70,16 @@
       flex-wrap: wrap;
     }
     .score-badge {
-      padding: 0.35cm 0.7cm;
-      border-radius: 100px;
-      font-size: 10pt;
+      padding: 0.45cm 1cm;
+      border-radius: 24px;
+      font-size: 11pt;
       font-weight: 600;
       color: white;
-      border: none;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
     }
-    .score-pass { background: linear-gradient(135deg, #059669, #10b981); }
-    .score-warn { background: linear-gradient(135deg, #d97706, #f59e0b); }
-    .score-fail { background: linear-gradient(135deg, #dc2626, #ef4444); }
+    .score-pass { background: linear-gradient(135deg, #059669, #047857); }
+    .score-warn { background: linear-gradient(135deg, #d97706, #b45309); }
+    .score-fail { background: linear-gradient(135deg, #dc2626, #b91c1c); }
     .cover-footer {
       margin-top: 2cm;
       font-size: 8pt;
@@ -90,47 +88,47 @@
     }
     .section { margin-bottom: 1cm; page-break-inside: avoid; }
     .section h2 {
-      font-family: 'Liberation Serif', 'DejaVu Serif', Georgia, serif;
       font-size: 14pt;
-      color: #1a1a1a;
-      border-bottom: 2px solid rgba(201, 169, 98, 0.35);
+      color: #1c1917;
+      border-bottom: 2px solid #c9a962;
       padding-bottom: 0.25cm;
       margin: 0 0 0.5cm;
       font-weight: 600;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.03em;
     }
-    .section h3 { font-size: 11pt; margin: 0.4cm 0 0.2cm; color: #334155; font-weight: 600; }
+    .section h3 { font-size: 11pt; margin: 0.4cm 0 0.2cm; color: #44403c; font-weight: 600; }
     .server-card {
       background: #ffffff;
-      border: 1px solid rgba(201, 169, 98, 0.2);
+      border: 1px solid #e7e5e4;
       border-radius: 8px;
-      padding: 0.6cm;
+      padding: 0.65cm;
       margin-bottom: 0.6cm;
       page-break-inside: avoid;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
-    .server-card.reachable { border-left: 4px solid #059669; }
-    .server-card.unreachable { border-left: 4px solid #dc2626; }
+    .server-card.reachable { border-left: 5px solid #059669; }
+    .server-card.unreachable { border-left: 5px solid #dc2626; }
     .check-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 0.25cm 0;
-      border-bottom: 1px solid #f5f3ef;
+      border-bottom: 1px solid #f5f5f4;
       font-size: 9pt;
     }
     .check-row:last-child { border-bottom: none; }
     .badge {
       display: inline-block;
       padding: 0.12cm 0.4cm;
-      border-radius: 100px;
+      border-radius: 14px;
       font-size: 8pt;
       font-weight: 600;
+      letter-spacing: 0.02em;
     }
-    .badge-pass { background: #d1fae5; color: #059669; }
+    .badge-pass { background: #d1fae5; color: #047857; }
     .badge-warn { background: #fef3c7; color: #b45309; }
-    .badge-fail { background: #fee2e2; color: #dc2626; }
-    .badge-info { background: #f5f3ef; color: #57534e; }
+    .badge-fail { background: #fee2e2; color: #b91c1c; }
+    .badge-info { background: #f5f5f4; color: #57534e; }
     .badge-n-a { background: #e7e5e4; color: #78716c; }
     table {
       width: 100%;
@@ -138,40 +136,35 @@
       font-size: 9pt;
       border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
     }
     thead { display: table-header-group; }
-    th, td { border: 1px solid rgba(201, 169, 98, 0.15); padding: 0.35cm; text-align: left; }
-    th {
-      background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
-      color: #f5f3ef;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-    }
-    tr:nth-child(even) { background: #faf9f7; }
+    th, td { border: 1px solid #e7e5e4; padding: 0.35cm; text-align: left; }
+    th { background: linear-gradient(135deg, #44403c, #57534e); color: #fafaf9; font-weight: 600; }
+    tr:nth-child(even) { background: #fafaf9; }
     .raw-pre {
-      font-family: 'Liberation Mono', 'DejaVu Sans Mono', monospace;
+      font-family: 'Consolas', 'Monaco', monospace;
       font-size: 7pt;
       white-space: pre-wrap;
-      background: #faf9f7;
-      padding: 0.35cm;
+      background: #fafaf9;
+      padding: 0.4cm;
       border-radius: 6px;
-      border: 1px solid rgba(201, 169, 98, 0.15);
+      border: 1px solid #e7e5e4;
       max-height: 4cm;
       overflow: hidden;
     }
     .fixes-box {
       background: #fffbeb;
-      border: 1px solid rgba(201, 169, 98, 0.3);
+      border: 1px solid #c9a962;
       border-radius: 6px;
-      padding: 0.35cm;
+      padding: 0.4cm;
       margin-top: 0.25cm;
       font-size: 9pt;
     }
     .fixes-box strong { color: #b45309; }
     .fixes-box ul { margin: 0.2cm 0 0 0.6cm; padding: 0; }
     .packages-list {
-      font-family: 'Liberation Mono', monospace;
+      font-family: 'Consolas', monospace;
       font-size: 7pt;
       column-count: 2;
       column-gap: 0.6cm;
@@ -180,9 +173,9 @@
     .report-footer {
       margin-top: 1.5cm;
       padding-top: 0.5cm;
-      border-top: 1px solid rgba(201, 169, 98, 0.2);
+      border-top: 2px solid #c9a962;
       font-size: 8pt;
-      color: #a8a29e;
+      color: #78716c;
       text-align: center;
       letter-spacing: 0.03em;
     }
@@ -203,9 +196,9 @@
         <span class="score-badge score-fail">Fail: {{ summary.fail }}</span>
       </div>
       {% endif %}
-      {% if error %><p style="color:#dc2626;font-weight:600;">Error: {{ error }}</p>{% endif %}
+      {% if error %}<p style="color:#dc2626;font-weight:600;">Error: {{ error }}</p>{% endif %}
     </div>
-    <p class="cover-footer">Confidential — Internal Use Only</p>
+    <p class="cover-footer">Confidential - Internal Use Only</p>
   </div>
 
   {% if not error %}
@@ -218,7 +211,7 @@
       <tbody>
       {% for name, data in servers.items() %}
       <tr>
-        <td>{{ name }}</td>
+        <td>{{ data.get('host', name) }}</td>
         <td>{{ data.get('user', 'ubuntu') }}</td>
         <td>{% if data.get('reachable') %}<span class="badge badge-pass">Reachable</span>{% else %}<span class="badge badge-fail">Unreachable</span>{% endif %}</td>
         <td>{{ data.get('checks', {})|length }} checks</td>
@@ -230,7 +223,7 @@
 
   {% for name, data in servers.items() %}
   <div class="section server-card {% if data.get('reachable') %}reachable{% else %}unreachable{% endif %}">
-    <h2>{{ name }}{% if data.get('host') and data.get('host') != name %} — {{ data.get('host') }}{% endif %}</h2>
+    <h2>{{ data.get('host', name) }} ({{ data.get('user', 'ubuntu') }})</h2>
     {% if data.get('error') %}
     <p style="color:#dc2626;font-weight:600;">Error: {{ data.error }}</p>
     {% else %}
@@ -238,7 +231,7 @@
     <div class="check-row">
       <span><strong>{{ check_name.replace('_', ' ').title() }}</strong></span>
       <span class="badge badge-{{ check_data.get('status', 'info') }}">
-        {{ check_data.get('status', 'info') }}{% if check_data.get('message') %} — {{ (check_data.message|default(''))[:50] }}{% elif check_data.get('findings') %} — {{ (check_data.findings[0]|default(''))[:50] }}{% endif %}
+        {{ check_data.get('status', 'info') }}{% if check_data.get('message') %} - {{ (check_data.message|default(''))[:50] }}{% elif check_data.get('findings') %} - {{ (check_data.findings[0]|default(''))[:50] }}{% endif %}
       </span>
     </div>
     {% if check_data.get('packages') %}
@@ -311,6 +304,6 @@
   </div>
   {% endif %}
   {% endif %}
-  <div class="report-footer">Server Security Scanner — Report generated automatically. Do not distribute.</div>
+  <div class="report-footer">Server Security Scanner - Report generated automatically. Do not distribute.</div>
 </body>
 </html>

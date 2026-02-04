@@ -1,7 +1,7 @@
 const API_BASE = "/api";
 
 export const api = {
-  async startScan(servers: Array<{ host: string; user: string; key_base64: string; host_name?: string }>) {
+  async startScan(servers: Array<{ host: string; host_name?: string; user: string; key_base64: string }>) {
     const res = await fetch(`${API_BASE}/scan`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

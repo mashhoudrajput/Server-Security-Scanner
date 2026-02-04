@@ -10,13 +10,10 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Create non-root user (no shell, no SSH)
-RUN adduser --disabled-password --gecos "" --no-create-home appuser
-
 # Enable non-free for nikto
 RUN sed -i 's/Components: main/Components: main non-free/' /etc/apt/sources.list.d/debian.sources
 
-# WeasyPrint + fonts + security tools (no openssh-server)
+# WeasyPrint + fonts + security tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpango-1.0-0 \
     libpangocairo-1.0-0 \
@@ -48,12 +45,6 @@ COPY reports/ ./reports/
 # Copy React build from stage 1
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
-# Own reports dir for non-root writes
-RUN chown -R appuser:appuser /app/reports
-
-USER appuser
-
 EXPOSE 8000
 
-# Run as non-root; no shell/exec needed for normal operation
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
