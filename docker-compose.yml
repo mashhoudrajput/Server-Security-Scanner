@@ -2,6 +2,9 @@ services:
   scanner:
     build: .
     network_mode: host
+    environment:
+      - OPENVAS_HOST=${OPENVAS_HOST:-}
+      - OPENVAS_API_KEY=${OPENVAS_API_KEY:-}
     volumes:
       - ./reports:/app/reports
     cap_add:

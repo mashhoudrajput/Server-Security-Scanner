@@ -1,13 +1,12 @@
 """Orchestrates security scans across servers and network tools."""
 
 import base64
+import os
 import shutil
 import subprocess
 import tempfile
 import uuid
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
-from pathlib import Path
 from typing import Any, Callable, Optional
 
 from .builtin import run_builtin_checks
@@ -39,7 +38,6 @@ def get_tool_availability() -> dict[str, dict[str, str | bool]]:
         "nuclei": ["nuclei", "-version"],
         "zmap": ["zmap", "--version"],
         "vuls": ["vuls", "version"],
-        "openvas": ["openvasd", "--version"],
         "testssl": ["testssl.sh", "--version"],
         "trivy": ["trivy", "--version"],
     }
@@ -56,7 +54,25 @@ def get_tool_availability() -> dict[str, dict[str, str | bool]]:
         except Exception:
             availability[name] = {"available": False, "status": "failed check"}
 
-    # Prowler can be either binary or python module.
+    openvas_available = False
+    openvas_status = "python-gvm missing"
+    try:
+        from gvm.protocols.http.openvasd import OpenvasdHttpAPIv1  # noqa: F401
+
+        host_cfg = bool(os.getenv("OPENVAS_HOST"))
+        api_key_cfg = bool(os.getenv("OPENVAS_API_KEY"))
+        openvas_available = host_cfg and api_key_cfg
+        if openvas_available:
+            openvas_status = "available (external server configured)"
+        else:
+            openvas_status = "python-gvm ready; set OPENVAS_HOST and OPENVAS_API_KEY"
+    except Exception:
+        openvas_available = False
+    availability["openvas"] = {
+        "available": openvas_available,
+        "status": openvas_status,
+    }
+
     prowler_available = False
     if shutil.which("prowler"):
         prowler_available = True
@@ -166,7 +182,6 @@ def run_scan(
     total_steps = 0
     done_steps = 0
 
-    # Count steps for progress
     server_tests = [t for t in tests if t in BUILTIN_TESTS]
     total_steps += len(servers) * len(server_tests)
     if "lynis" in tests:
@@ -198,7 +213,6 @@ def run_scan(
         if progress_callback:
             progress_callback(results["progress"])
 
-    # Per-server scans
     for server in servers:
         host = server.get("host", "")
         user = server.get("user", "ubuntu")
@@ -220,20 +234,17 @@ def run_scan(
 
             results["servers"][name]["reachable"] = True
 
-            # Built-in checks
             builtin_tests = [t for t in tests if t in BUILTIN_TESTS]
             if builtin_tests:
                 results["servers"][name]["checks"] = run_builtin_checks(executor, builtin_tests)
                 update_progress()
 
-            # Lynis
             if "lynis" in tests:
                 results["servers"][name]["lynis"] = run_lynis(executor)
                 update_progress()
         finally:
             executor.close()
 
-    # Vuls (all servers) - use first server's key
     if "vuls" in tests and servers:
         key_b64 = next((s.get("key_base64") for s in servers if s.get("key_base64")), "")
         if key_b64:
@@ -244,47 +255,39 @@ def run_scan(
                     results["network_scans"]["vuls"] = run_vuls(vuls_servers, key_data, tmp)
         update_progress()
 
-    # Nikto
     if "nikto" in tests and urls:
         results["network_scans"]["nikto"] = run_nikto(urls)
         update_progress()
 
-    # ZMap
     if "zmap" in tests and subnet:
         results["network_scans"]["zmap"] = run_zmap(subnet)
         update_progress()
 
-    # Nmap
     if "nmap" in tests and servers:
         hosts = [s.get("host", "").strip() for s in servers if s.get("host", "").strip()]
         if hosts:
             results["network_scans"]["nmap"] = run_nmap(hosts)
         update_progress()
 
-    # Nuclei
     if "nuclei" in tests and urls:
         results["network_scans"]["nuclei"] = run_nuclei(urls)
         update_progress()
 
-    # SSL/TLS security scan
     if "testssl" in tests and servers:
         hosts = [s.get("host", "").strip() for s in servers if s.get("host", "").strip()]
         if hosts:
             results["network_scans"]["testssl"] = run_testssl(hosts)
         update_progress()
 
-    # Container security scan
     if "trivy" in tests:
         hosts = [s.get("host", "").strip() for s in servers if s.get("host", "").strip()]
         results["network_scans"]["trivy"] = run_trivy(hosts)
         update_progress()
 
-    # Cloud posture scan
     if "prowler" in tests:
         results["network_scans"]["prowler"] = run_prowler()
         update_progress()
 
-    # OpenVAS
     if "openvas" in tests and openvas_config:
         results["network_scans"]["openvas"] = run_openvas(
             host=openvas_config.get("host", ""),
