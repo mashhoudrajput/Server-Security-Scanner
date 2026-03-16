@@ -16,14 +16,34 @@ class ScanService:
     def __init__(self) -> None:
         self._jobs: dict[str, dict[str, Any]] = {}
 
-    def start_scan(self, servers: list[dict], auto_mode: bool = True) -> str:
+    def start_scan(
+        self,
+        servers: list[dict],
+        auto_mode: bool = True,
+        tests: list[str] | None = None,
+        urls: list[str] | None = None,
+        subnet: str | None = None,
+        openvas_config: dict | None = None,
+        scan_profile: str = "regulatory",
+        target_types: list[str] | None = None,
+    ) -> str:
         """Start a new scan. Returns job_id."""
         job_id = str(uuid.uuid4())
         self._jobs[job_id] = {"job_id": job_id, "status": "running", "progress": 0}
 
         thread = threading.Thread(
             target=self._run_scan_task,
-            args=(job_id, servers, auto_mode),
+            args=(
+                job_id,
+                servers,
+                auto_mode,
+                tests,
+                urls,
+                subnet,
+                openvas_config,
+                scan_profile,
+                target_types,
+            ),
         )
         thread.daemon = True
         thread.start()
@@ -35,6 +55,12 @@ class ScanService:
         job_id: str,
         servers: list[dict],
         auto_mode: bool,
+        tests: list[str] | None,
+        urls: list[str] | None,
+        subnet: str | None,
+        openvas_config: dict | None,
+        scan_profile: str,
+        target_types: list[str] | None,
     ) -> None:
         """Background task to execute scan."""
         try:
@@ -42,12 +68,14 @@ class ScanService:
                 s["name"] = (s.get("host_name") or s.get("host") or "unknown").strip() or s.get("host", "unknown")
             results = run_scan(
                 servers=servers,
-                tests=[],
-                urls=None,
-                subnet=None,
-                openvas_config=None,
+                tests=tests,
+                urls=urls,
+                subnet=subnet,
+                openvas_config=openvas_config,
                 progress_callback=lambda p: self._update_progress(job_id, p),
                 auto_mode=auto_mode,
+                scan_profile=scan_profile,
+                target_types=target_types,
             )
             self._jobs[job_id] = results
         except Exception as e:

@@ -1,5 +1,7 @@
 """Scan-related Pydantic schemas."""
 
+from typing import Literal
+
 from pydantic import BaseModel
 
 
@@ -17,6 +19,10 @@ class ScanRequest(BaseModel):
 
     servers: list[ServerInput]
     auto_mode: bool = True
+    scan_profile: Literal["regulatory", "advanced"] = "regulatory"
+    target_types: list[
+        Literal["host", "network", "web", "api", "cloud", "container", "compliance"]
+    ] = ["host", "network", "web", "compliance"]
     tests: list[str] | None = None
     urls: list[str] | None = None
     subnet: str | None = None

@@ -6,6 +6,16 @@ export interface ServerInput {
   keyFileName?: string;
 }
 
+export type ScanProfile = "regulatory" | "advanced";
+export type TargetType =
+  | "host"
+  | "network"
+  | "web"
+  | "api"
+  | "cloud"
+  | "container"
+  | "compliance";
+
 export interface ScanStatus {
   job_id: string;
   status: "running" | "completed" | "error";
@@ -42,3 +52,10 @@ export interface NetworkScanResult {
   status: string;
   message?: string;
 }
+
+export interface ToolAvailabilityItem {
+  available: boolean;
+  status: string;
+}
+
+export type ToolAvailability = Record<string, ToolAvailabilityItem>;

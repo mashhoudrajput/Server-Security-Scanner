@@ -1,6 +1,8 @@
 """Orchestrates security scans across servers and network tools."""
 
 import base64
+import shutil
+import subprocess
 import tempfile
 import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -15,6 +17,9 @@ from .nikto import run_nikto
 from .nmap import run_nmap
 from .nuclei import run_nuclei
 from .openvas import run_openvas
+from .prowler import run_prowler
+from .testssl import run_testssl
+from .trivy import run_trivy
 from .vuls import run_vuls
 from .zmap import run_zmap
 
@@ -23,6 +28,55 @@ BUILTIN_TESTS = {
     "clamav", "rkhunter", "chkrootkit", "auditd", "apparmor", "unattended_upgrades", "sudo_users", "ssl_cert",
 }
 ALL_TESTS = list(BUILTIN_TESTS) + ["lynis", "vuls", "nikto", "zmap", "nmap", "nuclei"]
+ALL_TESTS += ["openvas", "testssl", "trivy", "prowler"]
+
+
+def get_tool_availability() -> dict[str, dict[str, str | bool]]:
+    """Return install availability for supported external tools."""
+    checks = {
+        "nmap": ["nmap", "--version"],
+        "nikto": ["nikto", "-Version"],
+        "nuclei": ["nuclei", "-version"],
+        "zmap": ["zmap", "--version"],
+        "vuls": ["vuls", "version"],
+        "openvas": ["openvasd", "--version"],
+        "testssl": ["testssl.sh", "--version"],
+        "trivy": ["trivy", "--version"],
+    }
+
+    availability: dict[str, dict[str, str | bool]] = {}
+    for name, command in checks.items():
+        binary = command[0]
+        if not shutil.which(binary):
+            availability[name] = {"available": False, "status": "not installed"}
+            continue
+        try:
+            subprocess.run(command, capture_output=True, check=False, timeout=6)
+            availability[name] = {"available": True, "status": "available"}
+        except Exception:
+            availability[name] = {"available": False, "status": "failed check"}
+
+    # Prowler can be either binary or python module.
+    prowler_available = False
+    if shutil.which("prowler"):
+        prowler_available = True
+    else:
+        try:
+            subprocess.run(
+                ["python3", "-m", "prowler", "--version"],
+                capture_output=True,
+                check=False,
+                timeout=6,
+            )
+            prowler_available = True
+        except Exception:
+            prowler_available = False
+    availability["prowler"] = {
+        "available": prowler_available,
+        "status": "available" if prowler_available else "not installed",
+    }
+
+    return availability
 
 
 def _derive_subnet(host: str) -> str | None:
@@ -50,6 +104,36 @@ def _derive_urls(servers: list[dict]) -> list[str]:
     return urls
 
 
+def _default_tests_for_profile(
+    scan_profile: str,
+    target_types: list[str] | None,
+) -> list[str]:
+    """Choose default tests for regulatory or advanced scans."""
+    regulatory = {"nmap", "nikto", "nuclei", "lynis", "testssl", "trivy", "prowler", "vuls"}
+    advanced_extra = {"zmap", "openvas"}
+
+    by_target = {
+        "host": BUILTIN_TESTS | {"lynis", "vuls"},
+        "network": {"nmap", "zmap", "openvas"},
+        "web": {"nikto", "nuclei", "testssl"},
+        "api": {"nuclei"},
+        "cloud": {"prowler"},
+        "container": {"trivy"},
+        "compliance": {"lynis", "testssl", "trivy", "prowler", "vuls"},
+    }
+
+    selected_targets = target_types or ["host", "network", "web", "compliance"]
+    selected_tests: set[str] = set()
+    for target in selected_targets:
+        selected_tests |= by_target.get(target, set())
+
+    selected_tests |= regulatory
+    if scan_profile == "advanced":
+        selected_tests |= advanced_extra
+
+    return [t for t in ALL_TESTS if t in selected_tests or t in BUILTIN_TESTS]
+
+
 def run_scan(
     servers: list[dict],
     tests: list[str] | None = None,
@@ -58,12 +142,14 @@ def run_scan(
     openvas_config: dict | None = None,
     progress_callback: Optional[Callable[[int], None]] = None,
     auto_mode: bool = False,
+    scan_profile: str = "regulatory",
+    target_types: list[str] | None = None,
 ) -> dict[str, Any]:
     """
     Run security scans. If auto_mode or tests empty, runs ALL tests and auto-derives URLs/subnet.
     """
     if auto_mode or not tests:
-        tests = ALL_TESTS
+        tests = _default_tests_for_profile(scan_profile=scan_profile, target_types=target_types)
         urls = urls or _derive_urls(servers)
         if not subnet and servers:
             subnet = _derive_subnet(servers[0].get("host", ""))
@@ -81,8 +167,10 @@ def run_scan(
     done_steps = 0
 
     # Count steps for progress
-    server_tests = [t for t in tests if t in BUILTIN_TESTS or t == "lynis"]
-    total_steps += len(servers) * (len(server_tests) + (1 if "lynis" in tests else 0))
+    server_tests = [t for t in tests if t in BUILTIN_TESTS]
+    total_steps += len(servers) * len(server_tests)
+    if "lynis" in tests:
+        total_steps += len(servers)
     if "vuls" in tests:
         total_steps += 1
     if "nikto" in tests and urls:
@@ -92,6 +180,12 @@ def run_scan(
     if "nmap" in tests and servers:
         total_steps += 1
     if "nuclei" in tests and urls:
+        total_steps += 1
+    if "testssl" in tests and servers:
+        total_steps += 1
+    if "trivy" in tests:
+        total_steps += 1
+    if "prowler" in tests:
         total_steps += 1
     if "openvas" in tests and openvas_config:
         total_steps += 1
@@ -170,6 +264,24 @@ def run_scan(
     # Nuclei
     if "nuclei" in tests and urls:
         results["network_scans"]["nuclei"] = run_nuclei(urls)
+        update_progress()
+
+    # SSL/TLS security scan
+    if "testssl" in tests and servers:
+        hosts = [s.get("host", "").strip() for s in servers if s.get("host", "").strip()]
+        if hosts:
+            results["network_scans"]["testssl"] = run_testssl(hosts)
+        update_progress()
+
+    # Container security scan
+    if "trivy" in tests:
+        hosts = [s.get("host", "").strip() for s in servers if s.get("host", "").strip()]
+        results["network_scans"]["trivy"] = run_trivy(hosts)
+        update_progress()
+
+    # Cloud posture scan
+    if "prowler" in tests:
+        results["network_scans"]["prowler"] = run_prowler()
         update_progress()
 
     # OpenVAS

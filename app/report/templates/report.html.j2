@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Server Security Scan Report</title>
+  <title>NGI Server Security Scan Report</title>
   <style>
     @page {
       size: A4;
@@ -12,7 +12,7 @@
       @bottom-center {
         font-size: 8pt;
         color: #78716c;
-        content: "Page " counter(page) " of " counter(pages) " — Server Security Scanner";
+        content: "Page " counter(page) " of " counter(pages) " — NGI Server Security Scanner";
       }
     }
     * { box-sizing: border-box; }
@@ -36,6 +36,13 @@
       background: linear-gradient(90deg, #a8a29e, #c9a962 50%, #e5d4a1);
       margin-bottom: 1.5cm;
       border-radius: 3px;
+    }
+    .cover-logo {
+      display: block;
+      margin: 0 auto 0.6cm;
+      max-height: 1.2cm;
+      width: auto;
+      object-fit: contain;
     }
     .cover-badge {
       display: inline-block;
@@ -184,9 +191,10 @@
 <body>
   <div class="cover-page">
     <div class="cover-bar"></div>
+    <img src="ngi-logo.png" alt="NGI" class="cover-logo">
     <p class="cover-badge">Enterprise Security</p>
     <div class="cover">
-      <h1>Server Security Scan Report</h1>
+      <h1>NGI Server Security Scan Report</h1>
       <p class="meta">Generated {{ timestamp }}</p>
       <p class="meta">{{ server_count }} server(s) scanned</p>
       {% if summary %}
@@ -303,7 +311,33 @@
     {% endfor %}
   </div>
   {% endif %}
+
+  {% if compliance_summary %}
+  <div class="section">
+    <h2>Compliance Mapping Summary</h2>
+    <table>
+      <thead>
+        <tr><th>Framework</th><th>Focus</th><th>Pass</th><th>Warn</th><th>Fail</th><th>Score</th></tr>
+      </thead>
+      <tbody>
+      {% for row in compliance_summary %}
+      <tr>
+        <td>{{ row.framework }}</td>
+        <td>{{ row.focus }}</td>
+        <td>{{ row.pass }}</td>
+        <td>{{ row.warn }}</td>
+        <td>{{ row.fail }}</td>
+        <td>{{ row.score }}%</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <p style="margin-top:0.35cm;color:#57534e;font-size:8pt;">
+      Note: This is an automated evidence-based mapping for triage and reporting, not a formal certification audit.
+    </p>
+  </div>
   {% endif %}
-  <div class="report-footer">Server Security Scanner - Report generated automatically. Do not distribute.</div>
+  {% endif %}
+  <div class="report-footer">NGI Server Security Scanner - Report generated automatically. Do not distribute.</div>
 </body>
 </html>

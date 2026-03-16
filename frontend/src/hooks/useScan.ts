@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { api } from "../services/api";
-import type { ScanStatus } from "../types/scan";
+import type { ScanProfile, ScanStatus, TargetType } from "../types/scan";
 
 const POLL_INTERVAL_MS = 1500;
 
@@ -31,13 +31,17 @@ export function useScan() {
   }, []);
 
   const startScan = useCallback(
-    async (servers: Array<{ host: string; user: string; key_base64: string }>) => {
+    async (input: {
+      servers: Array<{ host: string; host_name?: string; user: string; key_base64: string }>;
+      scanProfile: ScanProfile;
+      targetTypes: TargetType[];
+    }) => {
       setReportFilename(null);
       setReportError(null);
       setStatus(null);
       setIsScanning(true);
 
-      const { job_id } = await api.startScan(servers);
+      const { job_id } = await api.startScan(input);
       setJobId(job_id);
       pollStatus(job_id);
     },

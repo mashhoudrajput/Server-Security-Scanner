@@ -26,6 +26,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zmap \
     nikto \
     nmap \
+    git \
+    ca-certificates \
     curl \
     unzip \
     && rm -rf /var/lib/apt/lists/*
@@ -35,6 +37,18 @@ RUN curl -sL "https://github.com/projectdiscovery/nuclei/releases/download/v3.6.
     && unzip -o /tmp/nuclei.zip -d /usr/local/bin \
     && rm /tmp/nuclei.zip \
     && nuclei -update-templates 2>/dev/null || true
+
+# testssl.sh (best-effort install)
+RUN git clone --depth 1 https://github.com/drwetter/testssl.sh.git /opt/testssl.sh \
+    && ln -sf /opt/testssl.sh/testssl.sh /usr/local/bin/testssl.sh || true
+
+# Trivy (best-effort install)
+RUN curl -sfL https://github.com/aquasecurity/trivy/releases/download/v0.56.2/trivy_0.56.2_Linux-64bit.tar.gz \
+    -o /tmp/trivy.tar.gz \
+    && tar -xzf /tmp/trivy.tar.gz -C /tmp \
+    && mv /tmp/trivy /usr/local/bin/trivy \
+    && chmod +x /usr/local/bin/trivy \
+    && rm -f /tmp/trivy.tar.gz || true
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

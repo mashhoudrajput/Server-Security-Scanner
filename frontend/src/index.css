@@ -360,6 +360,103 @@ body::before {
   gap: 1.25rem;
 }
 
+.scan-options {
+  display: grid;
+  gap: 1rem;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.scan-option-group {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.scan-option-group label,
+.scan-option-group span {
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.scan-select {
+  width: 220px;
+  max-width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-main);
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+.target-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.target-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.target-chip input {
+  accent-color: var(--accent-gold);
+}
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.55rem;
+}
+
+.tool-chip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 0.45rem 0.6rem;
+}
+
+.tool-name {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.tool-badge {
+  padding: 0.18rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.tool-badge.ok {
+  background: var(--success-dim);
+  color: var(--success);
+}
+
+.tool-badge.missing {
+  background: var(--fail-dim);
+  color: var(--fail);
+}
+
 .btn-scan {
   display: flex;
   flex-direction: column;
